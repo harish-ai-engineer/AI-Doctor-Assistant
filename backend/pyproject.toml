@@ -1,7 +1,7 @@
 [project]
 name = "medtrace-api"
 version = "1.0.0"
-description = "Production-oriented AI Doctor Assistant for learning Langfuse"
+description = "Production-oriented AI Doctor Assistant for learning AgentGuard"
 requires-python = ">=3.10"
 
 [tool.ruff]

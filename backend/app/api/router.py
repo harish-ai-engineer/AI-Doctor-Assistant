@@ -12,7 +12,7 @@ from app.core.security import create_access_token
 from app.db.repositories import ConversationRepository, FeedbackRepository
 from app.schemas import ChatRequest, ExperimentUpdate, FeedbackRequest, LoginRequest, TokenResponse
 from app.services.chat_service import ChatService
-from app.services.langfuse_service import langfuse_service
+from app.services.agentguard_service import agentguard_service
 from app.services.rag_service import rag_service
 
 router = APIRouter()
@@ -24,7 +24,7 @@ async def health() -> dict[str, object]:
         "status": "healthy",
         "environment": settings.environment,
         "live_ai": settings.live_ai_enabled,
-        "langfuse": langfuse_service.enabled,
+        "agentguard": agentguard_service.enabled,
     }
 
 
@@ -58,8 +58,8 @@ async def feedback(
         value=payload.value,
         comment=payload.comment,
     )
-    langfuse_service.score(payload.trace_id, payload.value, payload.comment)
-    return {"id": record.id, "sent_to_langfuse": langfuse_service.enabled}
+    agentguard_service.score(payload.trace_id, payload.value, payload.comment)
+    return {"id": record.id, "sent_to_agentguard": agentguard_service.enabled}
 
 
 @router.get("/analytics/dashboard")
@@ -93,9 +93,9 @@ async def traces(session: AsyncSession = Depends(get_db)) -> list[dict[str, obje
 
 @router.get("/prompts/{label}")
 async def prompt(label: str) -> dict[str, object]:
-    if not langfuse_service.enabled:
-        return {"name": settings.langfuse_prompt_name, "label": label, "mode": "demo"}
-    item = langfuse_service.get_prompt(label)
+    if not agentguard_service.enabled:
+        return {"name": settings.prompt_name, "label": label, "mode": "demo"}
+    item = await agentguard_service.get_prompt(label=label)
     return {
         "name": item.name,
         "version": item.version,

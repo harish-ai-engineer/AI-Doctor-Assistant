@@ -65,7 +65,7 @@ export function AppShell() {
           ))}
         </nav>
         <div className="m-3 rounded-2xl border border-white/10 bg-white/5 p-3">
-          {!collapsed && <><div className="mb-2 flex items-center gap-2 text-xs text-white/70"><span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_12px_#34d399]" />Langfuse connected</div><p className="text-[10px] text-white/35">EU region · Production</p></>}
+          {!collapsed && <><div className="mb-2 flex items-center gap-2 text-xs text-white/70"><span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_12px_#34d399]" />AgentGuard connected</div><p className="text-[10px] text-white/35">EU region · Production</p></>}
           {collapsed && <span className="mx-auto block size-2 rounded-full bg-emerald-400 shadow-[0_0_12px_#34d399]" />}
         </div>
         <button className="hidden h-12 items-center justify-center border-t border-white/10 text-white/40 hover:text-white lg:flex" onClick={() => setCollapsed(!collapsed)}>

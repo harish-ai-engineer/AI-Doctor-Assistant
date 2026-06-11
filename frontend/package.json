@@ -2,6 +2,7 @@
   "name": "medtrace-ai-frontend",
   "private": true,
   "version": "1.0.0",
+  "packageManager": "pnpm@10.32.1",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",

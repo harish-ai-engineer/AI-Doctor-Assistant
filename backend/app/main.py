@@ -7,7 +7,7 @@ from app.api.router import router
 from app.core.config import settings
 from app.core.logging import configure_logging
 from app.db.base import init_db
-from app.services.langfuse_service import langfuse_service
+from app.services.agentguard_service import agentguard_service
 
 configure_logging()
 
@@ -16,14 +16,14 @@ configure_logging()
 async def lifespan(_: FastAPI):
     await init_db()
     yield
-    if langfuse_service.client:
-        langfuse_service.client.flush()
+    if agentguard_service.client:
+        agentguard_service.client.flush()
 
 
 app = FastAPI(
     title=settings.app_name,
     version="1.0.0",
-    description="AI engineering learning platform with Langfuse observability.",
+    description="AI engineering learning platform with AgentGuard observability.",
     lifespan=lifespan,
 )
 app.add_middleware(

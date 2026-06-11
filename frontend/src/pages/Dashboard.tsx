@@ -14,7 +14,7 @@ const metrics = [
 export function Dashboard() {
   return (
     <div>
-      <PageHeader eyebrow="System overview" title="Good morning, Dr. Chen" description="Your AI clinical assistant is healthy. Here is how prompts, traces, and patient conversations are performing." action={<Button><Activity className="size-4" />Open Langfuse</Button>} />
+      <PageHeader eyebrow="System overview" title="Good morning, Dr. Chen" description="Your AI clinical assistant is healthy. Here is how prompts, traces, and patient conversations are performing." action={<Button><Activity className="size-4" />Open AgentGuard</Button>} />
       <section className="metric-grid">{metrics.map((metric) => <MetricCard key={metric.label} {...metric} />)}</section>
 
       <section className="mt-5 grid gap-5 xl:grid-cols-[1.65fr_1fr]">
@@ -37,7 +37,7 @@ export function Dashboard() {
           </div>
         </Card>
         <Card className="p-5 sm:p-6">
-          <div className="mb-6 flex items-center justify-between"><div><h2 className="font-bold">Langfuse health</h2><p className="text-xs text-muted-foreground">Quality signals this month</p></div><Badge tone="success">Live</Badge></div>
+          <div className="mb-6 flex items-center justify-between"><div><h2 className="font-bold">AgentGuard health</h2><p className="text-xs text-muted-foreground">Quality signals this month</p></div><Badge tone="success">Live</Badge></div>
           <div className="space-y-5">
             {[
               { label: "User satisfaction", value: 92, meta: "4.6 / 5", icon: Star },
@@ -51,7 +51,7 @@ export function Dashboard() {
       </section>
 
       <Card className="mt-5 overflow-hidden">
-        <div className="flex items-center justify-between border-b p-5"><div><h2 className="font-bold">Recent traces</h2><p className="text-xs text-muted-foreground">Latest generations captured by Langfuse</p></div><Button variant="outline" size="sm">View all traces</Button></div>
+        <div className="flex items-center justify-between border-b p-5"><div><h2 className="font-bold">Recent traces</h2><p className="text-xs text-muted-foreground">Latest generations captured by AgentGuard</p></div><Button variant="outline" size="sm">View all traces</Button></div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-left text-sm"><thead className="bg-muted/60 text-[11px] uppercase tracking-wider text-muted-foreground"><tr>{["Trace", "User query", "Prompt", "Latency", "Tokens", "Cost", "Status"].map((h) => <th key={h} className="px-5 py-3 font-bold">{h}</th>)}</tr></thead>
           <tbody>{traces.slice(0, 4).map((trace) => <tr key={trace.id} className="border-t hover:bg-muted/35"><td className="px-5 py-4 font-mono text-xs text-primary">{trace.id}</td><td className="max-w-[260px] truncate px-5">{trace.query}</td><td className="px-5"><Badge tone="blue">{trace.prompt}</Badge></td><td className="px-5">{trace.latency}</td><td className="px-5">{trace.tokens}</td><td className="px-5 font-mono text-xs">{trace.cost}</td><td className="px-5"><Badge tone={trace.status === "Success" ? "success" : "warning"}>{trace.status}</Badge></td></tr>)}</tbody></table>

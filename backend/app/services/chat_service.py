@@ -10,15 +10,15 @@ from openai import AsyncOpenAI
 from app.core.config import settings
 from app.db.repositories import ConversationRepository
 from app.schemas import ChatRequest
-from app.services.langfuse_service import langfuse_service
+from app.services.agentguard_service import agentguard_service
 from app.services.rag_service import rag_service
 
 logger = structlog.get_logger()
 
 DEMO_RESPONSE = (
     "Demo mode is active, so no patient text was sent to an external model. "
-    "Configure OpenAI and Langfuse credentials, then create the `doctor-assistant` "
-    "chat prompt in Langfuse with a production label to enable traced responses."
+    "Configure OpenAI and AgentGuard credentials, then create the `AI Doctor` "
+    "chat prompt in AgentGuard with a production label to enable traced responses."
 )
 
 
@@ -44,14 +44,14 @@ class ChatService:
             else settings.prompt_label_b
         )
 
-        with langfuse_service.trace(
+        with agentguard_service.trace(
             name="doctor-chat",
             user_input=request.message,
             session_id=request.session_id,
             user_id=request.user_id,
         ) as root_span:
-            prompt = langfuse_service.get_prompt(label)
-            with langfuse_service.client.start_as_current_observation(
+            prompt = await agentguard_service.get_prompt(label=label)
+            with agentguard_service.client.start_as_current_observation(
                 as_type="retriever", name="medical-knowledge-retrieval"
             ) as retrieval:
                 chunks = await rag_service.retrieve(request.message)
@@ -67,18 +67,23 @@ class ChatService:
                 for chunk in chunks
             ) or "No matching knowledge-base context was retrieved."
             messages = prompt.compile(
+                symptoms=request.message,
                 patient_message=request.message,
                 rag_context=rag_context,
                 chat_history="No prior messages in this request.",
             )
 
-            with langfuse_service.client.start_as_current_observation(
+            with agentguard_service.client.start_as_current_observation(
                 as_type="generation",
                 name="openai-doctor-response",
                 model=settings.openai_model,
                 model_parameters={"temperature": 0.2},
                 input=messages,
-                prompt=prompt,
+                metadata={
+                    "prompt_name": prompt.name,
+                    "prompt_version": prompt.version,
+                    "prompt_labels": prompt.labels,
+                },
             ) as generation:
                 stream = await self.openai.chat.completions.create(
                     model=settings.openai_model,
@@ -118,7 +123,7 @@ class ChatService:
                         "generation_id": generation_id,
                     },
                 )
-                root_span.update_trace(output=output)
+                root_span.set_trace_io(input=request.message, output=output)
 
             await self.repository.create(
                 session_id=request.session_id,
@@ -139,3 +144,4 @@ class ChatService:
                 prompt_version=prompt.version,
                 latency_ms=latency_ms,
             )
+            agentguard_service.client.flush()
